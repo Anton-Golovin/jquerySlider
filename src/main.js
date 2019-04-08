@@ -1,26 +1,37 @@
-var slideWidth = 300;  //Ширина одного слайда
-var sliderTimer = setInterval(nextSlide, 1000);   //Интервал смены кадров
+$(document).ready(function () {
+    var slider = {
+        slideWidth: 300,  //Ширина одного слайда
+        sliderTime: 2000,   //Интервал смены кадров
+        nextSlide() {
+            /*функция, сменяющая слайды каждую секунду*/
+            var currentSlide = parseInt($('.slider').data('current'));  //определяем текущий слайд
+            currentSlide++;  //увеличиваем его значение
+            if (currentSlide >= $('.slider__item').length) { //если слайд последний
+                currentSlide = 0; // перематываем к началу
+            }
 
-/*Устанавливаем ширину списка
-*равную произведению ширины одного слайда на общее кол-во слайдов
-*чтобы он вытянулся в одну строку*/
-$('.slider').width($('.slider').children().length * slideWidth);
-/*задаем временной интервал*/
+            // передвигаем список слайдов
+            $('.slider').animate({left: -currentSlide * slider.slideWidth}, 300)
+                .data('current', currentSlide); // сохраняем значение текущего слайда
+        },
+        startSlider() {
+            /*Устанавливаем ширину списка
+            *равную произведению ширины одного слайда на общее кол-во слайдов
+            *чтобы он вытянулся в одну строку*/
+            $('.slider').width($('.slider__item').length * slider.slideWidth);
+            slider.sliderTimer = setInterval(this.nextSlide, slider.sliderTime);
+        },
+        stopOnHover() {
+            $('.visible').hover(function () {
+                clearInterval(slider.sliderTimer);
+            }, function () {
+                slider.sliderTimer = setInterval(slider.nextSlide, slider.sliderTime);
+            });
+        }
+    };
 
-/*функция, сменяющая слайды каждую секунду*/
-function nextSlide() {
-    var currentSlide = parseInt($('.slider').data('current'));  //определяем текущий слайд
-    currentSlide++;  //увеличиваем его значение
-    if (currentSlide >= $('.slider').children().length) { //перематываем к началу, если слайд последний
-        currentSlide = 0;
-    }
-    /*передвигаем список и сохраняем значение текущего слайда*/
-    $('.slider').animate({left: -currentSlide * slideWidth}, 300).data('current', currentSlide);
-}
-
-
-$('.visible').hover(function () {
-    clearInterval(sliderTimer);
-}, function () {
-    sliderTimer = setInterval(nextSlide, 1000);
+    // Вызываем метод старта слайда
+    slider.startSlider();
+    // Вызываем метод паузы слайда
+    slider.stopOnHover();
 });
